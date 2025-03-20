@@ -1,0 +1,100 @@
+import pandas as pd
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+
+# Sample DataFrame with "Sim", "Spot", "Shares", and "Notional" columns.
+df = pd.DataFrame({
+    "Sim":      [0, 0, 0, 0, 1, 1, 1, 1],
+    "Path":     ["A", "B", "C", "D", "A", "B", "C", "D"],  # for context
+    "Spot":     [1, 2, 3, 4, 2, 3, 4, 5],
+    "Shares":   [10, 20, 30, 40, 5, 15, 35, 55],
+    "Notional": [100, 200, 300, 400, 50, 150, 350, 550]
+})
+
+# Identify unique Sim values.
+unique_sims = sorted(df["Sim"].unique())
+
+# Create a figure with a secondary y-axis.
+fig = make_subplots(specs=[[{"secondary_y": True}]])
+
+# Filter data for the initial Sim value.
+initial_sim = unique_sims[0]
+df_initial = df[df["Sim"] == initial_sim]
+
+# Add initial traces:
+# Left y-axis for Shares and right y-axis for Notional.
+fig.add_trace(
+    go.Scatter(x=df_initial["Spot"], y=df_initial["Shares"],
+               mode='lines+markers', name="Shares"),
+    secondary_y=False
+)
+fig.add_trace(
+    go.Scatter(x=df_initial["Spot"], y=df_initial["Notional"],
+               mode='lines+markers', name="Notional"),
+    secondary_y=True
+)
+
+# Build frames—one for each unique Sim value.
+frames = []
+for sim in unique_sims:
+    dff = df[df["Sim"] == sim]
+    frames.append(go.Frame(
+        data=[
+            go.Scatter(x=dff["Spot"], y=dff["Shares"], mode='lines+markers'),
+            go.Scatter(x=dff["Spot"], y=dff["Notional"], mode='lines+markers')
+        ],
+        name=str(sim)
+    ))
+fig.frames = frames
+
+# Create slider steps corresponding to each Sim value.
+slider_steps = []
+for sim in unique_sims:
+    slider_steps.append({
+        "args": [
+            [str(sim)],
+            {"frame": {"duration": 500, "redraw": True},
+             "mode": "immediate",
+             "transition": {"duration": 300}}
+        ],
+        "label": str(sim),
+        "method": "animate"
+    })
+
+# Set overall axis ranges based on the full dataset.
+shares_min, shares_max = df["Shares"].min(), df["Shares"].max()
+notional_min, notional_max = df["Notional"].min(), df["Notional"].max()
+
+# Update the layout.
+fig.update_layout(
+    title="Interactive Plot with Dual Y Axes for Shares and Notional",
+    xaxis=dict(
+        title="Spot",
+        automargin=True  # Ensures x-axis labels fit
+    ),
+    yaxis=dict(
+        title="Shares",
+        automargin=True,
+        range=[shares_min, shares_max],
+        showgrid=True  # Primary axis gridlines for alignment
+    ),
+    yaxis2=dict(
+        title="Notional",
+        automargin=True,
+        range=[notional_min, notional_max],
+        showgrid=False,  # Disable gridlines so they align with the primary axis
+        overlaying='y',
+        side='right'
+    ),
+    sliders=[{
+        "active": 0,
+        "currentvalue": {"prefix": "Sim: "},
+        "pad": {"t": 50},
+        "steps": slider_steps
+    }],
+    width=800,    # Adjust figure width
+    height=600,   # Adjust figure height
+    margin=dict(l=80, r=80, t=50, b=80)  # Extra bottom margin for x-axis labels
+)
+
+fig.show()
