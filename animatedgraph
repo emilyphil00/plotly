@@ -65,6 +65,14 @@ for sim in unique_sims:
 shares_min, shares_max = df["Shares"].min(), df["Shares"].max()
 notional_min, notional_max = df["Notional"].min(), df["Notional"].max()
 
+dtick_shares = 10
+primary_ticks = list(range(shares_min, shares_max + 1, dtick_shares))
+# Compute corresponding secondary ticks via linear transformation.
+secondary_ticks = [
+    notional_min + (tick - shares_min) * (notional_max - notional_min) / (shares_max - shares_min)
+    for tick in primary_ticks
+]
+
 # Update the layout.
 fig.update_layout(
     title="Interactive Plot with Dual Y Axes for Shares and Notional",
