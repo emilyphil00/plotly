@@ -13,35 +13,35 @@ for idx in range(len(vega_weights_all)):
         ax=axes[0]
     ).patches
 
-    # remove x‐ticks
+    # clear the crowded x-ticks
     axes[0].set_xticks([])
 
-    # compute max bar height
-    max_h = max(bar.get_height() for bar in bars)
+    # define a few relative offsets (as multipliers of bar height)
+    offsets = [1.05, 1.10, 1.15, 1.20]
 
-    # define two “lanes” inside the plot
-    lane_low  = max_h * 0.10   # 10% up
-    lane_high = max_h * 0.40   # 40% up
-
-    # annotate each non‐zero bar in one of the lanes
-    for bar, opt in zip(bars, vega_weights_all[idx].index):
+    # annotate each bar
+    for i, (bar, opt) in enumerate(zip(bars, vega_weights_all[idx].index)):
         h = bar.get_height()
         if h <= 0:
             continue
 
-        x = bar.get_x() + bar.get_width() / 2
+        x = bar.get_x() + bar.get_width()/2
+        mult = offsets[i % len(offsets)]
+        y_text = h * mult
 
-        # choose lane based on bar height (so labels don't stack)
-        y_text = lane_low  if h < max_h * 0.5 else lane_high
-        color  = "black"  if h < max_h * 0.5 else "white"
-
-        axes[0].text(
-            x, y_text, opt,
-            ha="center", va="center",
-            rotation=90,
-            color=color,
+        axes[0].annotate(
+            opt,                      # label text
+            xy=(x, h),                # arrow tip (bar top)
+            xytext=(x, y_text),       # label position
+            ha="center", va="bottom", # center horizontally, text bottom at y_text
+            arrowprops=dict(
+                arrowstyle="->",
+                lw=1,
+                shrinkA=0, shrinkB=2
+            ),
+            rotation=0,
             fontsize=9,
-            clip_on=True                # keep it inside the axes
+            clip_on=True
         )
 
     axes[0].set_title('Vega% Distribution')
@@ -59,7 +59,7 @@ for idx in range(len(vega_weights_all)):
     # ── 4) Gamma$ ──────────────────────────────────
     sns.lineplot(data=gamma_ts_all[idx].iloc[:,0], ax=axes[3])
 
-    # ── common styling for axes 1,2,3 ──────────────
+    # common styling for plots 2–4
     for i in [1, 2, 3]:
         axes[i].set_xlabel('')
         axes[i].set_ylabel('')
