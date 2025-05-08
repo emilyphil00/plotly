@@ -7,34 +7,44 @@ for idx in range(len(vega_weights_all)):
     fig, axes = plt.subplots(1, 4, figsize=(20, 5))
 
     # ── 1) Vega% Distribution ──────────────────────
-    sns.barplot(
-        x=vega_weights_all[idx].index,       # your “option” names
-        y=vega_weights_all[idx].iloc[:,0],   # the vega values
+    bars = sns.barplot(
+        x=vega_weights_all[idx].index,
+        y=vega_weights_all[idx].iloc[:,0],
         ax=axes[0]
-    )
-    # drop the messy x‐axis ticks
+    ).patches
+
+    # remove x‐ticks
     axes[0].set_xticks([])
 
-    # arrow annotations
-    bars = axes[0].patches
+    # compute max bar height
     max_h = max(bar.get_height() for bar in bars)
-    label_y = max_h * 1.10   # 10% above the tallest bar
+
+    # define two “lanes” inside the plot
+    lane_low  = max_h * 0.10   # 10% up
+    lane_high = max_h * 0.40   # 40% up
+
+    # annotate each non‐zero bar in one of the lanes
     for bar, opt in zip(bars, vega_weights_all[idx].index):
         h = bar.get_height()
-        if h > 0:
-            x = bar.get_x() + bar.get_width()/2
-            axes[0].annotate(
-                opt,
-                xy=(x, h),            # point of the arrow
-                xytext=(x, label_y),  # label position
-                ha='center', va='bottom',
-                arrowprops=dict(
-                    arrowstyle='->',
-                    color='gray',
-                    lw=1
-                ),
-                rotation=0           # horizontal text
-            )
+        if h <= 0:
+            continue
+
+        x = bar.get_x() + bar.get_width() / 2
+
+        # choose lane based on bar height (so labels don't stack)
+        y_text = lane_low  if h < max_h * 0.5 else lane_high
+        color  = "black"  if h < max_h * 0.5 else "white"
+
+        axes[0].text(
+            x, y_text, opt,
+            ha="center", va="center",
+            rotation=90,
+            color=color,
+            fontsize=9,
+            clip_on=True                # keep it inside the axes
+        )
+
+    axes[0].set_title('Vega% Distribution')
 
     # ── 2) PNL$ ─────────────────────────────────────
     sns.lineplot(data=pnl_ts_all[idx].iloc[:,0], ax=axes[1])
@@ -49,7 +59,7 @@ for idx in range(len(vega_weights_all)):
     # ── 4) Gamma$ ──────────────────────────────────
     sns.lineplot(data=gamma_ts_all[idx].iloc[:,0], ax=axes[3])
 
-    # ── common styling for plots 1,2,3 ─────────────
+    # ── common styling for axes 1,2,3 ──────────────
     for i in [1, 2, 3]:
         axes[i].set_xlabel('')
         axes[i].set_ylabel('')
@@ -60,7 +70,6 @@ for idx in range(len(vega_weights_all)):
         axes[i].tick_params(axis='x', rotation=90)
 
     # titles & layout
-    axes[0].set_title('Vega% Distribution')
     axes[1].set_title('PNL$')
     axes[2].set_title('Cumulative PNL$')
     axes[3].set_title('Gamma$')
