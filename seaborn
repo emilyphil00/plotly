@@ -50,3 +50,19 @@ for idx in range(len(vega_weights_all)):
     plt.tight_layout()
     plt.show()
     break
+
+
+
+import io, base64
+
+buf = io.BytesIO()
+fig.savefig(buf, format='png', bbox_inches='tight')
+buf.seek(0)
+
+# encode to base64 and build HTML
+img_b64 = base64.b64encode(buf.read()).decode('utf-8')
+html = f'<img src="data:image/png;base64,{img_b64}" alt="my plot"/>'
+
+# now you can write `html` out to an .html file or embed in a Jupyter cell/output
+with open("my_plot.html", "w") as f:
+    f.write(html)
