@@ -1,0 +1,70 @@
+from matplotlib.ticker import FuncFormatter
+import matplotlib.dates as mdates
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+for idx in range(len(vega_weights_all)):
+    fig, axes = plt.subplots(1, 4, figsize=(20, 5))
+
+    # ── 1) Vega% Distribution ──────────────────────
+    sns.barplot(
+        x=vega_weights_all[idx].index,       # your “option” names
+        y=vega_weights_all[idx].iloc[:,0],   # the vega values
+        ax=axes[0]
+    )
+    # drop the messy x‐axis ticks
+    axes[0].set_xticks([])
+
+    # arrow annotations
+    bars = axes[0].patches
+    max_h = max(bar.get_height() for bar in bars)
+    label_y = max_h * 1.10   # 10% above the tallest bar
+    for bar, opt in zip(bars, vega_weights_all[idx].index):
+        h = bar.get_height()
+        if h > 0:
+            x = bar.get_x() + bar.get_width()/2
+            axes[0].annotate(
+                opt,
+                xy=(x, h),            # point of the arrow
+                xytext=(x, label_y),  # label position
+                ha='center', va='bottom',
+                arrowprops=dict(
+                    arrowstyle='->',
+                    color='gray',
+                    lw=1
+                ),
+                rotation=0           # horizontal text
+            )
+
+    # ── 2) PNL$ ─────────────────────────────────────
+    sns.lineplot(data=pnl_ts_all[idx].iloc[:,0], ax=axes[1])
+    axes[1].set_ylim(-50_000, 100_000)
+    axes[1].yaxis.set_major_formatter(
+        FuncFormatter(lambda y, pos: f"{int(y/1000)}k")
+    )
+
+    # ── 3) Cumulative PNL$ ──────────────────────────
+    sns.lineplot(data=pnl_ts_all[idx].iloc[:,0].cumsum(), ax=axes[2])
+
+    # ── 4) Gamma$ ──────────────────────────────────
+    sns.lineplot(data=gamma_ts_all[idx].iloc[:,0], ax=axes[3])
+
+    # ── common styling for plots 1,2,3 ─────────────
+    for i in [1, 2, 3]:
+        axes[i].set_xlabel('')
+        axes[i].set_ylabel('')
+        axes[i].yaxis.set_major_formatter(
+            FuncFormatter(lambda y, pos: f"{int(y/1000)}k")
+        )
+        axes[i].xaxis.set_major_formatter(mdates.DateFormatter('%m/%y'))
+        axes[i].tick_params(axis='x', rotation=90)
+
+    # titles & layout
+    axes[0].set_title('Vega% Distribution')
+    axes[1].set_title('PNL$')
+    axes[2].set_title('Cumulative PNL$')
+    axes[3].set_title('Gamma$')
+
+    plt.tight_layout()
+    plt.show()
+    break
