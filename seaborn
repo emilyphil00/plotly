@@ -1,50 +1,29 @@
+import re
 from matplotlib.ticker import FuncFormatter
 import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
 import seaborn as sns
 
+# define which numeric prefixes to keep
+keep_prefixes = set(['1','5','10','15','20','25','30','35','40','45','50'])
+
 for idx in range(len(vega_weights_all)):
     fig, axes = plt.subplots(1, 4, figsize=(20, 5))
 
     # ── 1) Vega% Distribution ──────────────────────
-    bars = sns.barplot(
+    sns.barplot(
         x=vega_weights_all[idx].index,
         y=vega_weights_all[idx].iloc[:,0],
         ax=axes[0]
-    ).patches
-
-    # clear the crowded x-ticks
-    axes[0].set_xticks([])
-
-    # define a few relative offsets (as multipliers of bar height)
-    offsets = [1.05, 1.10, 1.15, 1.20]
-
-    # annotate each bar
-    for i, (bar, opt) in enumerate(zip(bars, vega_weights_all[idx].index)):
-        h = bar.get_height()
-        if h <= 0:
-            continue
-
-        x = bar.get_x() + bar.get_width()/2
-        mult = offsets[i % len(offsets)]
-        y_text = h * mult
-
-        axes[0].annotate(
-            opt,                      # label text
-            xy=(x, h),                # arrow tip (bar top)
-            xytext=(x, y_text),       # label position
-            ha="center", va="bottom", # center horizontally, text bottom at y_text
-            arrowprops=dict(
-                arrowstyle="->",
-                lw=1,
-                shrinkA=0, shrinkB=2
-            ),
-            rotation=0,
-            fontsize=9,
-            clip_on=True
-        )
-
+    )
     axes[0].set_title('Vega% Distribution')
+
+    # now filter tick labels
+    for tick in axes[0].get_xticklabels():
+        label = tick.get_text()              # e.g. "10P", "19P", "100C"
+        m = re.match(r"(\d+)", label)        # grab the leading digits
+        if not m or m.group(1) not in keep_prefixes:
+            tick.set_visible(False)          # hide unwanted labels
 
     # ── 2) PNL$ ─────────────────────────────────────
     sns.lineplot(data=pnl_ts_all[idx].iloc[:,0], ax=axes[1])
@@ -52,27 +31,21 @@ for idx in range(len(vega_weights_all)):
     axes[1].yaxis.set_major_formatter(
         FuncFormatter(lambda y, pos: f"{int(y/1000)}k")
     )
+    axes[1].set_title('PNL$')
+    axes[1].xaxis.set_major_formatter(mdates.DateFormatter('%m/%y'))
+    axes[1].tick_params(axis='x', rotation=90)
 
     # ── 3) Cumulative PNL$ ──────────────────────────
     sns.lineplot(data=pnl_ts_all[idx].iloc[:,0].cumsum(), ax=axes[2])
+    axes[2].set_title('Cumulative PNL$')
+    axes[2].xaxis.set_major_formatter(mdates.DateFormatter('%m/%y'))
+    axes[2].tick_params(axis='x', rotation=90)
 
     # ── 4) Gamma$ ──────────────────────────────────
     sns.lineplot(data=gamma_ts_all[idx].iloc[:,0], ax=axes[3])
-
-    # common styling for plots 2–4
-    for i in [1, 2, 3]:
-        axes[i].set_xlabel('')
-        axes[i].set_ylabel('')
-        axes[i].yaxis.set_major_formatter(
-            FuncFormatter(lambda y, pos: f"{int(y/1000)}k")
-        )
-        axes[i].xaxis.set_major_formatter(mdates.DateFormatter('%m/%y'))
-        axes[i].tick_params(axis='x', rotation=90)
-
-    # titles & layout
-    axes[1].set_title('PNL$')
-    axes[2].set_title('Cumulative PNL$')
     axes[3].set_title('Gamma$')
+    axes[3].xaxis.set_major_formatter(mdates.DateFormatter('%m/%y'))
+    axes[3].tick_params(axis='x', rotation=90)
 
     plt.tight_layout()
     plt.show()
