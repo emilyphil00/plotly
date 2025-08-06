@@ -1,0 +1,53 @@
+📦 Pitch 1: IBIT Accumulation Program (ASR-Style with Embedded Ceiling)
+
+🧠 Strategic Rationale
+
+Bitcoin is entering the later phase of its post-halving cycle, a window that historically has coincided with accelerated institutional inflows and strong price performance. With the Fed expected to begin cutting rates in September, market positioning is shifting toward long-duration and non-sovereign assets. Real rates are beginning to compress, and risk appetite is re-emerging across portfolios.
+
+IBIT has emerged as the preferred institutional wrapper for Bitcoin exposure — offering deep liquidity, regulatory clarity, and operational simplicity. For allocators seeking to increase exposure without impacting price, a structured accumulation program offers a capital-efficient, passive approach.
+
+⸻
+
+🔧 Trade Structure
+	•	Objective: Accumulate a target notional or share count of IBIT over a defined time horizon.
+	•	Execution: Passive participation in daily volume, benchmarked to VWAP over a 20–30 trading day period.
+	•	Embedded Ceiling: An optional maximum execution price (e.g. 105% of initial reference level) limits exposure to slippage or breakout risk. If breached intraday, the remaining execution may be deferred or rebalanced.
+
+⸻
+
+📈 Client Benefits
+	•	Efficient entry into IBIT over time, minimizing signaling or market impact.
+	•	Full transparency via VWAP benchmark execution.
+	•	Optional price ceiling provides control over execution slippage in the event of a sharp BTC rally.
+	•	Ideal for institutions seeking to position into a potential Q4 risk-on cycle ahead of confirmed Fed cuts.
+
+⸻
+
+🔄 Pitch 2: IBIT Disposal Program (Reverse ASR-Style with Embedded Floor)
+
+🧠 Strategic Rationale
+
+Bitcoin has rallied significantly since the January ETF launches and April 2024 halving. With the first rate cut expected in September, market consensus is increasingly priced in. Some funds may look to rebalance exposure into strength, particularly as crypto beta begins to consolidate post-run. Disposing of a large IBIT position via standard block trades or open market selling risks moving the tape and impacting marks.
+
+A reverse ASR-style structure enables passive, rules-based unwinding with minimal market footprint — and can include price protection via an embedded execution floor.
+
+⸻
+
+🔧 Trade Structure
+	•	Objective: Dispose of a defined IBIT position over a fixed time window.
+	•	Execution: Daily participation in market volume, benchmarked to VWAP over 15–20 trading days.
+	•	Embedded Floor: An optional minimum execution price (e.g. 95% of initial reference level) can be embedded. If the floor is breached, execution slows or pauses, with discretion to re-enter as prices recover.
+
+⸻
+
+📈 Client Benefits
+	•	Structured, passive disposal of IBIT with reduced market footprint.
+	•	Floor-based pricing protection reduces exposure to short-term BTC volatility or macro surprises (e.g. inflation, geopolitics).
+	•	Retains full transparency — average execution benchmarked to VWAP.
+	•	Well-suited for funds seeking to derisk into strength, rotate capital, or tactically reduce BTC beta.
+
+⸻
+
+⏱ Tenor Considerations
+	•	15–20 days: Ideal for tactical disposal programs, allowing risk to be offloaded smoothly over multiple liquidity windows.
+	•	20–30 days: Preferred for strategic accumulation programs, enabling a gradual build into potentially improving macro and crypto market conditions.
